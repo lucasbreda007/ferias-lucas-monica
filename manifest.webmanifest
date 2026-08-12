@@ -1,0 +1,19 @@
+{
+  "name": "Férias do Lucas e da Mônica",
+  "short_name": "Férias L&M",
+  "description": "Contagem regressiva de tempo corrido e horas úteis até as férias.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#c9edf7",
+  "theme_color": "#004F59",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
