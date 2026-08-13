@@ -1,5 +1,5 @@
-const CACHE_NAME="ferias-lm-v8";
-const CORE=["./","./index.html","./manifest.webmanifest","./icon.svg"];
+const CACHE_NAME="ferias-lm-v9";
+const CORE=["./","./index.html","./manifest.webmanifest","./icon.svg","./notifications-v9.js"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(
@@ -17,21 +17,35 @@ self.addEventListener("activate",event=>{
   );
 });
 
+async function addNotificationModule(response){
+  const text=await response.text();
+  const html=text.includes("notifications-v9.js")
+    ? text
+    : text.replace("</body>",'<script src="./notifications-v9.js?v=9"></script></body>');
+  const headers=new Headers(response.headers);
+  headers.delete("content-length");
+  headers.delete("content-encoding");
+  headers.set("content-type","text/html; charset=utf-8");
+  return new Response(html,{status:response.status,statusText:response.statusText,headers});
+}
+
 self.addEventListener("fetch",event=>{
   if(event.request.method!=="GET")return;
   const url=new URL(event.request.url);
   if(url.origin!==location.origin)return;
 
   if(event.request.mode==="navigate"){
-    event.respondWith(
-      fetch(event.request,{cache:"no-store"})
-        .then(response=>{
-          const copy=response.clone();
-          caches.open(CACHE_NAME).then(cache=>cache.put("./index.html",copy));
-          return response;
-        })
-        .catch(()=>caches.match("./index.html"))
-    );
+    event.respondWith((async()=>{
+      try{
+        const response=await fetch(event.request,{cache:"no-store"});
+        const copy=response.clone();
+        caches.open(CACHE_NAME).then(cache=>cache.put("./index.html",copy));
+        return addNotificationModule(response);
+      }catch(_){
+        const cached=await caches.match("./index.html");
+        return cached?addNotificationModule(cached):Response.error();
+      }
+    })());
     return;
   }
 
