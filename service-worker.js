@@ -1,4 +1,4 @@
-const CACHE_NAME="ferias-lm-v6";
+const CACHE_NAME="ferias-lm-v7";
 const CORE=["./","./index.html","./manifest.webmanifest","./icon.svg","./bank-tools.js"];
 
 self.addEventListener("install",e=>e.waitUntil(
@@ -15,7 +15,7 @@ async function injectBankTools(response){
   const text=await response.text();
   const html=text.includes("bank-tools.js")
     ? text
-    : text.replace("</body>",'<script src="./bank-tools.js?v=6"></script></body>');
+    : text.replace("</body>",'<script src="./bank-tools.js?v=7"></script></body>');
   const headers=new Headers(response.headers);
   headers.delete("content-length");
   headers.delete("content-encoding");
