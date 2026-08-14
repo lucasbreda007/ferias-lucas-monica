@@ -1,5 +1,5 @@
-const CACHE_NAME="ferias-lm-v9";
-const CORE=["./","./index.html","./manifest.webmanifest","./icon.svg","./notifications-v9.js"];
+const CACHE_NAME="ferias-lm-v10";
+const CORE=["./","./index.html","./manifest.webmanifest","./icon.svg","./notifications-v9.js","./weather-v10.js"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(
@@ -17,11 +17,11 @@ self.addEventListener("activate",event=>{
   );
 });
 
-async function addNotificationModule(response){
+async function addAppModules(response){
   const text=await response.text();
-  const html=text.includes("notifications-v9.js")
-    ? text
-    : text.replace("</body>",'<script src="./notifications-v9.js?v=9"></script></body>');
+  let html=text;
+  if(!html.includes("notifications-v9.js"))html=html.replace("</body>",'<script src="./notifications-v9.js?v=9"></script></body>');
+  if(!html.includes("weather-v10.js"))html=html.replace("</body>",'<script src="./weather-v10.js?v=10"></script></body>');
   const headers=new Headers(response.headers);
   headers.delete("content-length");
   headers.delete("content-encoding");
@@ -40,10 +40,10 @@ self.addEventListener("fetch",event=>{
         const response=await fetch(event.request,{cache:"no-store"});
         const copy=response.clone();
         caches.open(CACHE_NAME).then(cache=>cache.put("./index.html",copy));
-        return addNotificationModule(response);
+        return addAppModules(response);
       }catch(_){
         const cached=await caches.match("./index.html");
-        return cached?addNotificationModule(cached):Response.error();
+        return cached?addAppModules(cached):Response.error();
       }
     })());
     return;
